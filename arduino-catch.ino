@@ -16,7 +16,9 @@
 #define PALLET_POSITIONS 30
 #define MAXIMUM_BALLS 12
 #define BALL_MAX_Y 8
-#define BALL_DELAY 50
+#define BALL_MAX_X 15
+#define BALL_SPEED_DELAY 10
+#define BALL_ALIVE_DELAY 50
 
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7); 
 
@@ -58,8 +60,6 @@ typedef struct {
 int position;
 Ball balls[MAXIMUM_BALLS];
 
-
-
 void setup() {
   lcd.begin(16, 2);
 
@@ -72,19 +72,32 @@ void setup() {
   lcd.createChar(BALL_SPRITE_3, ballSprite3);
   
   lcd.clear();
-  lcd.setCursor(0, TOP_ROW); 
-  lcd.print("Hej :)");
+
+  initializeBalls();
 }
 
 void loop() {
   position = PALLET_POSITIONS - analogRead(A0) * PALLET_POSITIONS / 1024.0;
 
+  generateBalls();
   moveBalls();
-  clearBottomRow();
+
+  clearAllRows();
+  
   drawBalls();
   drawPallet();
   
   delay(GAME_DELAY);
+}
+
+void clearAllRows() {
+  clearTopRow();
+  clearBottomRow();
+}
+
+void clearTopRow() {
+  lcd.setCursor(0, TOP_ROW);
+  lcd.print("                ");
 }
 
 void clearBottomRow() {
@@ -92,8 +105,26 @@ void clearBottomRow() {
   lcd.print("                ");
 }
 
+void disableBall(byte i) {
+  balls[i].alive = false;
+  balls[i].ticks = random(50, 256);
+}
+
+void enableBall(byte i) {
+  balls[i].alive = true;
+  balls[i].y = 0;
+  balls[i].x = random(0, BALL_MAX_X);
+  balls[i].ticks = BALL_SPEED_DELAY;
+}
+
+void initializeBalls() {
+  for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
+    disableBall(i);
+  }
+}
+
 void drawPallet() {
-  if (position % 2 == 0) {  
+  if (position % 2 == 0) {
     lcd.setCursor(position / 2, BOTTOM_ROW);
     lcd.write(byte(PALLET_SPRITE));
   } else {
@@ -104,21 +135,61 @@ void drawPallet() {
   }
 }
 
+void generateBalls() {
+  for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
+    if (!balls[i].alive) {
+      generateBall(i);
+    }
+  }
+}
+
+void generateBall(byte i) {
+  balls[i].ticks -= 1;
+
+  if (balls[i].ticks <= 0) {
+    enableBall(i);
+  }
+}
+
 void moveBalls() {
   for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
     if (balls[i].alive) {
-      balls[i].ticks += 1;
-      if (balls[i].ticks > BALL_DELAY) {
-        balls[i].ticks = 0;
-        balls[i].y += 1;
-        if (balls[i].y > BALL_MAX_Y) {
-          balls[i].alive = false;
-        }
-      }
+      moveBall(i);
+    }
+  }
+}
+
+void moveBall(byte i) {
+  balls[i].ticks -= 1;
+  
+  if (balls[i].ticks == 0) {
+    balls[i].ticks = BALL_SPEED_DELAY;
+    balls[i].y += 1;
+    
+    if (balls[i].y > BALL_MAX_Y) {
+      disableBall(i);
     }
   }
 }
 
 void drawBalls() {
-  
+  for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
+    if (balls[i].alive) {
+      if (balls[i].y < 4) {
+        lcd.setCursor(balls[i].x, TOP_ROW);
+      } else {
+        lcd.setCursor(balls[i].x, BOTTOM_ROW);
+      }
+
+      if (balls[i].y == 0 || balls[i].y == 4) {
+        lcd.write(byte(BALL_SPRITE_0));
+      } else if (balls[i].y == 1 || balls[i].y == 5) {
+        lcd.write(byte(BALL_SPRITE_1));
+      } else if (balls[i].y == 2 || balls[i].y == 6) {
+        lcd.write(byte(BALL_SPRITE_2));
+      } else if (balls[i].y == 3 || balls[i].y == 7) {
+        lcd.write(byte(BALL_SPRITE_3));
+      }
+    }
+  }
 }
