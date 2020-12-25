@@ -1,24 +1,27 @@
 #include <LiquidCrystal.h>
 
-#define GAME_DELAY 25
+#define GAME_DELAY          25
 
-#define TOP_ROW 0
-#define BOTTOM_ROW 1
+#define TOP_ROW             0
+#define BOTTOM_ROW          1
 
-#define PALLET_SPRITE 0
-#define PALLET_SPRITE_LEFT 1
+#define PALLET_SPRITE       0
+#define PALLET_SPRITE_LEFT  1
 #define PALLET_SPRITE_RIGHT 2
-#define BALL_SPRITE_0 3
-#define BALL_SPRITE_1 4
-#define BALL_SPRITE_2 5
-#define BALL_SPRITE_3 6
+#define BALL_SPRITE_0       3
+#define BALL_SPRITE_1       4
+#define BALL_SPRITE_2       5
+#define BALL_SPRITE_3       6
 
-#define PALLET_POSITIONS 30
-#define MAXIMUM_BALLS 12
-#define BALL_MAX_Y 8
-#define BALL_MAX_X 15
-#define BALL_SPEED_DELAY 10
-#define BALL_ALIVE_DELAY 50
+#define PALLET_POSITIONS    30
+
+#define MAXIMUM_BALLS       12
+#define BALL_MAX_Y          7
+#define BALL_MAX_X          15
+#define BALL_STEP_DELAY     20
+#define BALL_ALIVE_DELAY    50
+
+#define MAX_ANALOG_READ 1024.0
 
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7); 
 
@@ -66,6 +69,7 @@ void setup() {
   lcd.createChar(PALLET_SPRITE, palletSprite);
   lcd.createChar(PALLET_SPRITE_LEFT, palletSpriteLeft);
   lcd.createChar(PALLET_SPRITE_RIGHT, palletSpriteRight);
+  
   lcd.createChar(BALL_SPRITE_0, ballSprite0);
   lcd.createChar(BALL_SPRITE_1, ballSprite1);
   lcd.createChar(BALL_SPRITE_2, ballSprite2);
@@ -76,8 +80,26 @@ void setup() {
   initializeBalls();
 }
 
+void initializeBalls() {
+  for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
+    disableBall(i);
+  }
+}
+
+void disableBall(byte i) {
+  balls[i].alive = false;
+  balls[i].ticks = random(50, 256);
+}
+
+void enableBall(byte i) {
+  balls[i].alive = true;
+  balls[i].ticks = BALL_STEP_DELAY;
+  balls[i].y = 0;
+  balls[i].x = random(0, BALL_MAX_X);
+}
+
 void loop() {
-  position = PALLET_POSITIONS - analogRead(A0) * PALLET_POSITIONS / 1024.0;
+  position = readPalletPosition();
 
   generateBalls();
   moveBalls();
@@ -88,6 +110,10 @@ void loop() {
   drawPallet();
   
   delay(GAME_DELAY);
+}
+
+byte readPalletPosition() {
+  return PALLET_POSITIONS - analogRead(A0) * PALLET_POSITIONS / MAX_ANALOG_READ;
 }
 
 void clearAllRows() {
@@ -103,24 +129,6 @@ void clearTopRow() {
 void clearBottomRow() {
   lcd.setCursor(0, BOTTOM_ROW);
   lcd.print("                ");
-}
-
-void disableBall(byte i) {
-  balls[i].alive = false;
-  balls[i].ticks = random(50, 256);
-}
-
-void enableBall(byte i) {
-  balls[i].alive = true;
-  balls[i].y = 0;
-  balls[i].x = random(0, BALL_MAX_X);
-  balls[i].ticks = BALL_SPEED_DELAY;
-}
-
-void initializeBalls() {
-  for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
-    disableBall(i);
-  }
 }
 
 void drawPallet() {
@@ -162,34 +170,39 @@ void moveBalls() {
 void moveBall(byte i) {
   balls[i].ticks -= 1;
   
-  if (balls[i].ticks == 0) {
-    balls[i].ticks = BALL_SPEED_DELAY;
-    balls[i].y += 1;
+  if (balls[i].ticks <= 0) {
+    stepBall(i);
+  }
+}
+
+void stepBall(byte i) {
+  balls[i].ticks = BALL_STEP_DELAY;
+  balls[i].y += 1;
     
-    if (balls[i].y > BALL_MAX_Y) {
-      disableBall(i);
-    }
+  if (balls[i].y > BALL_MAX_Y) {
+    disableBall(i);
   }
 }
 
 void drawBalls() {
   for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
     if (balls[i].alive) {
+      
       if (balls[i].y < 4) {
         lcd.setCursor(balls[i].x, TOP_ROW);
       } else {
         lcd.setCursor(balls[i].x, BOTTOM_ROW);
       }
 
-      if (balls[i].y == 0 || balls[i].y == 4) {
-        lcd.write(byte(BALL_SPRITE_0));
-      } else if (balls[i].y == 1 || balls[i].y == 5) {
-        lcd.write(byte(BALL_SPRITE_1));
-      } else if (balls[i].y == 2 || balls[i].y == 6) {
-        lcd.write(byte(BALL_SPRITE_2));
-      } else if (balls[i].y == 3 || balls[i].y == 7) {
-        lcd.write(byte(BALL_SPRITE_3));
+      byte ballCharacterPosition = balls[i].y % 4;
+
+      switch (ballCharacterPosition) {
+        case 0: lcd.write(byte(BALL_SPRITE_0)); break;
+        case 1: lcd.write(byte(BALL_SPRITE_1)); break;
+        case 2: lcd.write(byte(BALL_SPRITE_2)); break;
+        case 3: lcd.write(byte(BALL_SPRITE_3)); break;
       }
+      
     }
   }
 }
