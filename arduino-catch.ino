@@ -1,5 +1,7 @@
 #include <LiquidCrystal.h>
 
+#define GAME_DELAY 25
+
 #define TOP_ROW 0
 #define BOTTOM_ROW 1
 
@@ -12,6 +14,9 @@
 #define BALL_SPRITE_3 6
 
 #define PALLET_POSITIONS 30
+#define MAXIMUM_BALLS 12
+#define BALL_MAX_Y 8
+#define BALL_DELAY 50
 
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7); 
 
@@ -43,13 +48,17 @@ byte ballSprite3[] = {
   B00000, B00000, B00000, B00000, B00000, B00000, B11000, B11000
 };
 
-int position;
-
-struct ball {
+typedef struct {
   byte x;
   byte y;
-  int ticks;
-};
+  byte ticks;
+  boolean alive;
+} Ball;
+
+int position;
+Ball balls[MAXIMUM_BALLS];
+
+
 
 void setup() {
   lcd.begin(16, 2);
@@ -75,7 +84,7 @@ void loop() {
   drawBalls();
   drawPallet();
   
-  delay(25);
+  delay(GAME_DELAY);
 }
 
 void clearBottomRow() {
@@ -96,7 +105,18 @@ void drawPallet() {
 }
 
 void moveBalls() {
-  
+  for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
+    if (balls[i].alive) {
+      balls[i].ticks += 1;
+      if (balls[i].ticks > BALL_DELAY) {
+        balls[i].ticks = 0;
+        balls[i].y += 1;
+        if (balls[i].y > BALL_MAX_Y) {
+          balls[i].alive = false;
+        }
+      }
+    }
+  }
 }
 
 void drawBalls() {
