@@ -14,14 +14,21 @@ void setup() {
 double readValue;
 int position;
 
-
 void loop() {
   position = 15 - analogRead(A0) * 15.0/1024.0;
 
+  clearBottomRow();
+  drawPallet();
+  
+  delay(25);
+}
+
+void clearBottomRow() {
   lcd.setCursor(0, BOTTOM_ROW);
   lcd.print("                ");
+}
 
+void drawPallet() {
   lcd.setCursor(position, BOTTOM_ROW);
   lcd.print("_");
-  delay(50);
 }
