@@ -5,15 +5,6 @@
 #define TOP_ROW             0
 #define BOTTOM_ROW          1
 
-#define BALL_SPRITE_0       0
-#define BALL_SPRITE_1       1
-#define BALL_SPRITE_2       2
-#define BALL_SPRITE_3       3
-#define PALLET_SPRITE       4
-#define PALLET_SPRITE_LEFT  5
-#define PALLET_SPRITE_RIGHT 6
-#define MIXED_SPRITE        4
-
 #define PALLET_POSITIONS    30
 
 #define MAXIMUM_BALLS       12
@@ -48,26 +39,10 @@ typedef struct {
 
 int position;
 Ball balls[MAXIMUM_BALLS];
-boolean isPalletSpriteMixed;
-byte mixedSpriteBall;
-byte mixedSpritePallet;
 
 void setup() {
   lcd.begin(16, 2);
-
-  recreateAllPalletSprites();
-  
-  lcd.createChar(BALL_SPRITE_0, ballSprites[0]);
-  lcd.createChar(BALL_SPRITE_1, ballSprites[1]);
-  lcd.createChar(BALL_SPRITE_2, ballSprites[2]);
-  lcd.createChar(BALL_SPRITE_3, ballSprites[3]);
-
-  isPalletSpriteMixed = false;
-  mixedSpriteBall = 0;
-  mixedSpritePallet = 0;
-
   engineInit(lcd);
-  
   initializeBalls();
 }
 
@@ -102,12 +77,12 @@ byte generateFreeBallX(byte i) {
 void loop() {
   position = readPalletPosition();
 
-  //generateBalls();
-  //moveBalls();
+  generateBalls();
+  moveBalls();
   
   engineClear(lcd);
 
-  //drawBalls();
+  drawBalls();
   drawPallet();
 
   engineFlush(lcd);
@@ -126,12 +101,6 @@ void drawPallet() {
     engineDraw(palletSprites[0], position / 2, BOTTOM_ROW);
     engineDraw(palletSprites[2], position / 2 + 1, BOTTOM_ROW);
   }
-}
-
-void recreateAllPalletSprites() {
-  lcd.createChar(PALLET_SPRITE_LEFT, palletSprites[0]);
-  lcd.createChar(PALLET_SPRITE, palletSprites[1]);
-  lcd.createChar(PALLET_SPRITE_RIGHT, palletSprites[2]);
 }
 
 void generateBalls() {
@@ -178,66 +147,10 @@ void stepBall(byte i) {
 void drawBalls() {
   for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
     if (balls[i].alive) {
-      
-      if (balls[i].y < 4) {
-        lcd.setCursor(balls[i].x, TOP_ROW);
-      } else {
-        lcd.setCursor(balls[i].x, BOTTOM_ROW);
-      }
-
+      byte row = balls[i].y < 4 ? TOP_ROW : BOTTOM_ROW;
       byte ballSpriteNumber = balls[i].y % 4;
-     
-      if (palletSharesFieldWithBall(i)) {
-        if (!isPalletSpriteMixed) {
-          isPalletSpriteMixed = true;
-        }
-        updateMixedSpriteIfNeeded(ballSpriteNumber);
-        lcd.write(MIXED_SPRITE);
-      } else {
-        lcd.write(ballSpriteNumber);
-      }
+
+      engineDraw(ballSprites[ballSpriteNumber], balls[i].x, row);
     }
   }
-}
-
-boolean palletSharesFieldWithAnyBall() {
-  for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
-    if (balls[i].alive) {
-      if (palletSharesFieldWithBall(i)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-boolean palletSharesFieldWithBall(byte i) {
-  return (balls[i].y >= 4 && balls[i].x == position / 2);
-}
-
-void updateMixedSpriteIfNeeded(byte newMixedSpriteBall) {
-  byte newMixedSpritePallet;
-
-  if (position % 2 == 0) {
-    newMixedSpritePallet = 1;
-  } else {
-    newMixedSpritePallet = 0;
-  }
-  
-  if (mixedSpriteBall != newMixedSpriteBall) {
-    mixedSpriteBall = newMixedSpriteBall;
-    createBallAndPalletMixedSprite(mixedSpriteBall, mixedSpritePallet);
-  } else if (mixedSpritePallet != newMixedSpritePallet) {
-    mixedSpritePallet = newMixedSpritePallet;
-    createBallAndPalletMixedSprite(mixedSpriteBall, mixedSpritePallet);
-  }
-}
-
-void createBallAndPalletMixedSprite(byte ballSpriteNumber, byte palletSpriteNumber) {
-  byte mixedSprite[8];
-  
-  for (byte y = 0; y < 8; ++y) {
-    mixedSprite[y] = (palletSprites[palletSpriteNumber][y] | ballSprites[ballSpriteNumber][y]);
-  }
-  lcd.createChar(MIXED_SPRITE, mixedSprite);
 }
