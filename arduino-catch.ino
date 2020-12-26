@@ -26,16 +26,10 @@
 
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7); 
 
-byte palletSprite[8] = {
-  B00000, B00000, B00000, B00000, B00000, B00000, B00000, B11111
-};
-
-byte palletSpriteLeft[8] = {
-  B00000, B00000, B00000, B00000, B00000, B00000, B00000, B00011
-};
-
-byte palletSpriteRight[8] = {
-  B00000, B00000, B00000, B00000, B00000, B00000, B00000, B11000
+byte palletSprites[4][8] = {
+  { B00000, B00000, B00000, B00000, B00000, B00000, B00000, B00011 },
+  { B00000, B00000, B00000, B00000, B00000, B00000, B00000, B11111 },
+  { B00000, B00000, B00000, B00000, B00000, B00000, B00000, B11000 }
 };
 
 byte ballSprites[4][8] = {
@@ -55,14 +49,15 @@ typedef struct {
 int position;
 Ball balls[MAXIMUM_BALLS];
 boolean isPalletSpriteMixed;
-byte mixedSpriteY;
+byte mixedSpriteBall;
+byte mixedSpritePallet;
 
 void setup() {
   lcd.begin(16, 2);
 
-  lcd.createChar(PALLET_SPRITE, palletSprite);
-  lcd.createChar(PALLET_SPRITE_LEFT, palletSpriteLeft);
-  lcd.createChar(PALLET_SPRITE_RIGHT, palletSpriteRight);
+  lcd.createChar(PALLET_SPRITE_LEFT, palletSprites[0]);
+  lcd.createChar(PALLET_SPRITE, palletSprites[1]);
+  lcd.createChar(PALLET_SPRITE_RIGHT, palletSprites[2]);
   
   lcd.createChar(BALL_SPRITE_0, ballSprites[0]);
   lcd.createChar(BALL_SPRITE_1, ballSprites[1]);
@@ -72,7 +67,8 @@ void setup() {
   lcd.clear();
 
   isPalletSpriteMixed = false;
-  mixedSpriteY = 0;
+  mixedSpriteBall = 0;
+  mixedSpritePallet = 0;
   
   initializeBalls();
 }
@@ -129,7 +125,9 @@ void drawPallet() {
   }
 
   if (isPalletSpriteMixed) {
-    lcd.createChar(PALLET_SPRITE, palletSprite);
+    lcd.createChar(PALLET_SPRITE_LEFT, palletSprites[0]);
+    lcd.createChar(PALLET_SPRITE, palletSprites[1]);
+    lcd.createChar(PALLET_SPRITE_RIGHT, palletSprites[2]);
     isPalletSpriteMixed = false;
   }
   
@@ -201,7 +199,7 @@ void drawBalls() {
         if (!isPalletSpriteMixed) {
           isPalletSpriteMixed = true;
         }
-        updateMixedSpriteIfNeeded(ballSpriteNumber, balls[i].y);
+        updateMixedSpriteIfNeeded(ballSpriteNumber);
         lcd.write(MIXED_SPRITE);
       } else {
         lcd.write(ballSpriteNumber);
@@ -225,18 +223,29 @@ boolean palletSharesFieldWithBall(byte i) {
   return (balls[i].y >= 4 && balls[i].x == position / 2);
 }
 
-void updateMixedSpriteIfNeeded(byte ballSpriteNumber, byte ballY) {
-  if (mixedSpriteY != ballY) {
-    createBallAndPalletMixedSprite(ballSpriteNumber);
-    mixedSpriteY = ballY;
+void updateMixedSpriteIfNeeded(byte newMixedSpriteBall) {
+  byte newMixedSpritePallet;
+
+  if (position % 2 == 0) {
+    newMixedSpritePallet = 1;
+  } else {
+    newMixedSpritePallet = 0;
+  }
+  
+  if (mixedSpriteBall != newMixedSpriteBall) {
+    mixedSpriteBall = newMixedSpriteBall;
+    createBallAndPalletMixedSprite(mixedSpriteBall, mixedSpritePallet);
+  } else if (mixedSpritePallet != newMixedSpritePallet) {
+    mixedSpritePallet = newMixedSpritePallet;
+    createBallAndPalletMixedSprite(mixedSpriteBall, mixedSpritePallet);
   }
 }
 
-void createBallAndPalletMixedSprite(byte ballSpriteNumber) {
+void createBallAndPalletMixedSprite(byte ballSpriteNumber, byte palletSpriteNumber) {
   byte mixedSprite[8];
   
   for (byte y = 0; y < 8; ++y) {
-    mixedSprite[y] = (palletSprite[y] | ballSprites[ballSpriteNumber][y]);
+    mixedSprite[y] = (palletSprites[palletSpriteNumber][y] | ballSprites[ballSpriteNumber][y]);
   }
   lcd.createChar(MIXED_SPRITE, mixedSprite);
 }
