@@ -14,7 +14,7 @@ void engineInit(LiquidCrystal lcd) {
 
 void engineDraw(byte sprite[], byte x, byte y) {
   for (byte i = 0; i < 8; ++i) {
-    screen[x][y][i] = (screen[x][y][i] | sprite[i]);
+    screen[y][x][i] = (screen[y][x][i] | sprite[i]);
   }
   fieldActive[y][x] = true;
 }

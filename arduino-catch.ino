@@ -61,12 +61,12 @@ void setup() {
   lcd.createChar(BALL_SPRITE_1, ballSprites[1]);
   lcd.createChar(BALL_SPRITE_2, ballSprites[2]);
   lcd.createChar(BALL_SPRITE_3, ballSprites[3]);
-  
-  lcd.clear();
 
   isPalletSpriteMixed = false;
   mixedSpriteBall = 0;
   mixedSpritePallet = 0;
+
+  engineInit(lcd);
   
   initializeBalls();
 }
@@ -102,13 +102,15 @@ byte generateFreeBallX(byte i) {
 void loop() {
   position = readPalletPosition();
 
-  generateBalls();
-  moveBalls();
+  //generateBalls();
+  //moveBalls();
   
-  lcd.clear();
+  engineClear(lcd);
 
-  drawBalls();
+  //drawBalls();
   drawPallet();
+
+  engineFlush(lcd);
   
   delay(GAME_DELAY);
 }
@@ -117,34 +119,12 @@ byte readPalletPosition() {
   return PALLET_POSITIONS - analogRead(A0) * PALLET_POSITIONS / MAX_ANALOG_READ;
 }
 
-void clearTopRow() {
-  lcd.setCursor(0, TOP_ROW);
-  lcd.print("                ");
-}
-
-void clearBottomRow() {
-  lcd.setCursor(0, BOTTOM_ROW);
-  lcd.print("                ");
-}
-
 void drawPallet() {
-  if (palletSharesFieldWithAnyBall()) {
-    return;
-  }
-
-  if (isPalletSpriteMixed) {
-    recreateAllPalletSprites();
-    isPalletSpriteMixed = false;
-  }
-  
   if (position % 2 == 0) {
-    lcd.setCursor(position / 2, BOTTOM_ROW);
-    lcd.write(byte(PALLET_SPRITE));
+    engineDraw(palletSprites[1], position / 2, BOTTOM_ROW);
   } else {
-    lcd.setCursor(position / 2, BOTTOM_ROW);
-    lcd.write(byte(PALLET_SPRITE_LEFT));
-    lcd.setCursor(position / 2 + 1, BOTTOM_ROW);
-    lcd.write(byte(PALLET_SPRITE_RIGHT));
+    engineDraw(palletSprites[0], position / 2, BOTTOM_ROW);
+    engineDraw(palletSprites[2], position / 2 + 1, BOTTOM_ROW);
   }
 }
 
