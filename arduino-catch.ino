@@ -46,6 +46,8 @@ void setup() {
   if (DEBUG) {
     Serial.begin(9600);
   }
+  lcd.begin(16, 2);
+  
   engineInit(lcd);
   initializeBalls();
 }

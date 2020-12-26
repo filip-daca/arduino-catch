@@ -9,7 +9,6 @@ boolean spriteUsed[MAX_SPRITES];
 boolean fieldActive[2][16];
 
 void engineInit(LiquidCrystal lcd) {
-  lcd.begin(16, 2);
   engineClear(lcd);
   for (byte i = 0; i < MAX_SPRITES; ++i) {
     memset(customSprites[i], B00000, SPRITE_LEN);
