@@ -55,9 +55,7 @@ byte mixedSpritePallet;
 void setup() {
   lcd.begin(16, 2);
 
-  lcd.createChar(PALLET_SPRITE_LEFT, palletSprites[0]);
-  lcd.createChar(PALLET_SPRITE, palletSprites[1]);
-  lcd.createChar(PALLET_SPRITE_RIGHT, palletSprites[2]);
+  recreateAllPalletSprites();
   
   lcd.createChar(BALL_SPRITE_0, ballSprites[0]);
   lcd.createChar(BALL_SPRITE_1, ballSprites[1]);
@@ -88,7 +86,17 @@ void enableBall(byte i) {
   balls[i].alive = true;
   balls[i].ticks = BALL_STEP_DELAY;
   balls[i].y = 0;
-  balls[i].x = random(0, BALL_MAX_X);
+  balls[i].x = generateFreeBallX(i);
+}
+
+byte generateFreeBallX(byte i) {
+  byte newX = random(0, BALL_MAX_X);
+  for (byte b = 0; b < MAXIMUM_BALLS; ++b) {
+    if (b != i && balls[b].x == newX && balls[b].y < 4) {
+      return generateFreeBallX(i);
+    }
+  }
+  return newX;
 }
 
 void loop() {
@@ -125,9 +133,7 @@ void drawPallet() {
   }
 
   if (isPalletSpriteMixed) {
-    lcd.createChar(PALLET_SPRITE_LEFT, palletSprites[0]);
-    lcd.createChar(PALLET_SPRITE, palletSprites[1]);
-    lcd.createChar(PALLET_SPRITE_RIGHT, palletSprites[2]);
+    recreateAllPalletSprites();
     isPalletSpriteMixed = false;
   }
   
@@ -140,6 +146,12 @@ void drawPallet() {
     lcd.setCursor(position / 2 + 1, BOTTOM_ROW);
     lcd.write(byte(PALLET_SPRITE_RIGHT));
   }
+}
+
+void recreateAllPalletSprites() {
+  lcd.createChar(PALLET_SPRITE_LEFT, palletSprites[0]);
+  lcd.createChar(PALLET_SPRITE, palletSprites[1]);
+  lcd.createChar(PALLET_SPRITE_RIGHT, palletSprites[2]);
 }
 
 void generateBalls() {
