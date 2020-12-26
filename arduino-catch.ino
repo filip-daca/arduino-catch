@@ -1,5 +1,7 @@
 #include <LiquidCrystal.h>
 
+#define DEBUG               false
+
 #define GAME_DELAY          25
 
 #define TOP_ROW             0
@@ -41,7 +43,9 @@ int position;
 Ball balls[MAXIMUM_BALLS];
 
 void setup() {
-  lcd.begin(16, 2);
+  if (DEBUG) {
+    Serial.begin(9600);
+  }
   engineInit(lcd);
   initializeBalls();
 }
