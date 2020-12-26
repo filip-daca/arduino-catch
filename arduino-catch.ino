@@ -2,6 +2,8 @@
 
 #define DEBUG               false
 
+#define PIN_BUZZ            8
+
 #define GAME_DELAY          25
 
 #define TOP_ROW             0
@@ -50,6 +52,24 @@ void setup() {
   
   engineInit(lcd);
   initializeBalls();
+
+  pinMode(PIN_BUZZ, OUTPUT);
+  
+  playStartSound();
+}
+
+void playStartSound() {
+  tone(PIN_BUZZ, 1000);
+  delay(100);
+  noTone(PIN_BUZZ);
+}
+
+void playCatchSound() {
+  tone(PIN_BUZZ, 1500);
+}
+
+void playMissSound() {
+  tone(PIN_BUZZ, 500);
 }
 
 void initializeBalls() {
@@ -94,6 +114,8 @@ void loop() {
   engineFlush(lcd);
   
   delay(GAME_DELAY);
+
+  noTone(PIN_BUZZ);
 }
 
 byte readPalletPosition() {
@@ -147,6 +169,7 @@ void stepBall(byte i) {
     
   if (balls[i].y > BALL_MAX_Y) {
     disableBall(i);
+    playMissSound();
   }
 }
 
