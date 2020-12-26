@@ -5,13 +5,13 @@
 #define TOP_ROW             0
 #define BOTTOM_ROW          1
 
-#define PALLET_SPRITE       0
-#define PALLET_SPRITE_LEFT  1
-#define PALLET_SPRITE_RIGHT 2
-#define BALL_SPRITE_0       3
-#define BALL_SPRITE_1       4
-#define BALL_SPRITE_2       5
-#define BALL_SPRITE_3       6
+#define PALLET_SPRITE       4
+#define PALLET_SPRITE_LEFT  5
+#define PALLET_SPRITE_RIGHT 6
+#define BALL_SPRITE_0       0
+#define BALL_SPRITE_1       1
+#define BALL_SPRITE_2       2
+#define BALL_SPRITE_3       3
 
 #define PALLET_POSITIONS    30
 
@@ -195,14 +195,7 @@ void drawBalls() {
       }
 
       byte ballCharacterPosition = balls[i].y % 4;
-
-      switch (ballCharacterPosition) {
-        case 0: lcd.write(byte(BALL_SPRITE_0)); break;
-        case 1: lcd.write(byte(BALL_SPRITE_1)); break;
-        case 2: lcd.write(byte(BALL_SPRITE_2)); break;
-        case 3: lcd.write(byte(BALL_SPRITE_3)); break;
-      }
-      
+      lcd.write(ballCharacterPosition);
     }
   }
 }
