@@ -53,6 +53,8 @@ typedef struct {
   byte x;
   byte cooldown;
   byte visible;
+  byte sound;
+  boolean soundHit;
 } Fire;
 
 byte score;
@@ -75,25 +77,6 @@ void setup() {
   playStartSound();
 
   score = 0;
-}
-
-void playStartSound() {
-  tone(PIN_BUZZ, 1000);
-  delay(100);
-  noTone(PIN_BUZZ);
-}
-
-void playCatchSound() {
-  tone(PIN_BUZZ, 1500);
-}
-
-void playMissSound() {
-  tone(PIN_BUZZ, 500);
-}
-
-void playFireSound() {
-  tone(PIN_BUZZ, 2500);
-  tone(PIN_BUZZ, 2200);
 }
 
 void initializeBalls() {
@@ -138,6 +121,8 @@ void loop() {
   drawBalls();
   drawPallet();
   engineFlush(lcd);
+
+  playSounds();
   
   delay(GAME_DELAY);
 
@@ -222,9 +207,9 @@ void handleFire() {
 }
 
 void shoot() {
-  playFireSound();
-
   if (position % 2 == 0) {
+    startFireSound();
+    
     fire.x = position / 2;
     fire.visible = FIRE_STEP_DELAY;
 
@@ -232,8 +217,11 @@ void shoot() {
       if (balls[i].x == fire.x) {
         score++;
         disableBall(i);
+        startHitSound();
       }
     }
+  } else {
+    playMissSound();
   }
 }
 
