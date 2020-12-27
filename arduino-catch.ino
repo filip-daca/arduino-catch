@@ -6,7 +6,9 @@
 #define PIN_BUTTON          12
 
 #define GAME_DELAY          25
+
 #define FIRE_COOLDOWN       5
+#define FIRE_STEP_DELAY     3
 
 #define TOP_ROW             0
 #define BOTTOM_ROW          1
@@ -47,9 +49,11 @@ typedef struct {
   boolean alive;
 } Ball;
 
+byte score;
 int position;
 Ball balls[MAXIMUM_BALLS];
 byte fireCooldown;
+byte fireVisibleDelay;
 
 void setup() {
   if (DEBUG) {
@@ -64,6 +68,8 @@ void setup() {
   pinMode(PIN_BUTTON, INPUT_PULLUP);
   
   playStartSound();
+
+  score = 0;
 }
 
 void playStartSound() {
@@ -122,6 +128,8 @@ void loop() {
   engineClear(lcd);
 
   handleFire();
+
+  drawFire();
   drawBalls();
   drawPallet();
   engineFlush(lcd);
@@ -210,6 +218,20 @@ void handleFire() {
 
 void fire() {
   playFireSound();
-  engineDraw(fireSprite, position / 2, BOTTOM_ROW);
-  engineDraw(fireSprite, position / 2, TOP_ROW);
+  fireVisibleDelay = FIRE_STEP_DELAY;
+
+  for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
+    if (balls[i].x == position / 2) {
+      score++;
+      disableBall(i);
+    }
+  }
+}
+
+void drawFire() {
+  if (fireVisibleDelay > 0 && position % 2 == 0) {
+    engineDraw(fireSprite, position / 2, BOTTOM_ROW);
+    engineDraw(fireSprite, position / 2, TOP_ROW);
+    fireVisibleDelay--;
+  }
 }
