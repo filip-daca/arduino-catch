@@ -3,8 +3,10 @@
 #define DEBUG               false
 
 #define PIN_BUZZ            8
+#define PIN_BUTTON          12
 
 #define GAME_DELAY          25
+#define FIRE_COOLDOWN       5
 
 #define TOP_ROW             0
 #define BOTTOM_ROW          1
@@ -22,16 +24,20 @@
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7); 
 
 byte palletSprites[4][8] = {
-  { B00000, B00000, B00000, B00000, B00000, B00000, B00000, B00011 },
-  { B00000, B00000, B00000, B00000, B00000, B00000, B00000, B11111 },
-  { B00000, B00000, B00000, B00000, B00000, B00000, B00000, B11000 }
+  { B00000, B00000, B00000, B00000, B00000, B00000, B00001, B00011 },
+  { B00000, B00000, B00000, B00000, B00000, B00000, B01010, B11111 },
+  { B00000, B00000, B00000, B00000, B00000, B00000, B10000, B11000 }
 };
 
 byte ballSprites[4][8] = {
-  { B11000, B11000, B00000, B00000, B00000, B00000, B00000, B00000 },
-  { B00000, B00000, B11000, B11000, B00000, B00000, B00000, B00000 },
-  { B00000, B00000, B00000, B00000, B11000, B11000, B00000, B00000 },
-  { B00000, B00000, B00000, B00000, B00000, B00000, B11000, B11000 }
+  { B01110, B00000, B00000, B00000, B00000, B00000, B00000, B00000 },
+  { B00000, B01110, B01010, B01110, B00000, B00000, B00000, B00000 },
+  { B00000, B00000, B00000, B01110, B01010, B01110, B00000, B00000 },
+  { B00000, B00000, B00000, B00000, B00000, B00000, B01110, B01010 }
+};
+
+byte fireSprite[8] = {
+  B00100, B00100, B00100, B00100, B00100, B00100, B00100, B00100
 };
 
 typedef struct {
@@ -43,6 +49,7 @@ typedef struct {
 
 int position;
 Ball balls[MAXIMUM_BALLS];
+byte fireCooldown;
 
 void setup() {
   if (DEBUG) {
@@ -54,6 +61,7 @@ void setup() {
   initializeBalls();
 
   pinMode(PIN_BUZZ, OUTPUT);
+  pinMode(PIN_BUTTON, INPUT_PULLUP);
   
   playStartSound();
 }
@@ -70,6 +78,11 @@ void playCatchSound() {
 
 void playMissSound() {
   tone(PIN_BUZZ, 500);
+}
+
+void playFireSound() {
+  tone(PIN_BUZZ, 2500);
+  tone(PIN_BUZZ, 2200);
 }
 
 void initializeBalls() {
@@ -108,9 +121,9 @@ void loop() {
   
   engineClear(lcd);
 
+  handleFire();
   drawBalls();
   drawPallet();
-
   engineFlush(lcd);
   
   delay(GAME_DELAY);
@@ -182,4 +195,21 @@ void drawBalls() {
       engineDraw(ballSprites[ballSpriteNumber], balls[i].x, row);
     }
   }
+}
+
+void handleFire() {
+  if (fireCooldown > 0) {
+    fireCooldown--;
+  }
+  
+  if (digitalRead(PIN_BUTTON) == LOW && fireCooldown == 0) {
+    fireCooldown = FIRE_COOLDOWN;
+    fire();
+  }
+}
+
+void fire() {
+  playFireSound();
+  engineDraw(fireSprite, position / 2, BOTTOM_ROW);
+  engineDraw(fireSprite, position / 2, TOP_ROW);
 }
