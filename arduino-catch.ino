@@ -49,11 +49,16 @@ typedef struct {
   boolean alive;
 } Ball;
 
+typedef struct {
+  byte x;
+  byte cooldown;
+  byte visible;
+} Fire;
+
 byte score;
+Fire fire;
 int position;
 Ball balls[MAXIMUM_BALLS];
-byte fireCooldown;
-byte fireVisibleDelay;
 
 void setup() {
   if (DEBUG) {
@@ -206,32 +211,36 @@ void drawBalls() {
 }
 
 void handleFire() {
-  if (fireCooldown > 0) {
-    fireCooldown--;
+  if (fire.cooldown > 0) {
+    fire.cooldown--;
   }
   
-  if (digitalRead(PIN_BUTTON) == LOW && fireCooldown == 0) {
-    fireCooldown = FIRE_COOLDOWN;
-    fire();
+  if (digitalRead(PIN_BUTTON) == LOW && fire.cooldown == 0) {
+    fire.cooldown = FIRE_COOLDOWN;
+    shoot();
   }
 }
 
-void fire() {
+void shoot() {
   playFireSound();
-  fireVisibleDelay = FIRE_STEP_DELAY;
 
-  for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
-    if (balls[i].x == position / 2) {
-      score++;
-      disableBall(i);
+  if (position % 2 == 0) {
+    fire.x = position / 2;
+    fire.visible = FIRE_STEP_DELAY;
+
+    for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
+      if (balls[i].x == fire.x) {
+        score++;
+        disableBall(i);
+      }
     }
   }
 }
 
 void drawFire() {
-  if (fireVisibleDelay > 0 && position % 2 == 0) {
-    engineDraw(fireSprite, position / 2, BOTTOM_ROW);
-    engineDraw(fireSprite, position / 2, TOP_ROW);
-    fireVisibleDelay--;
+  if (fire.visible > 0) {
+    engineDraw(fireSprite, fire.x, BOTTOM_ROW);
+    engineDraw(fireSprite, fire.x, TOP_ROW);
+    fire.visible--;
   }
 }
