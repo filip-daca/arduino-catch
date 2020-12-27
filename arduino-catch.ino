@@ -15,11 +15,12 @@
 
 #define PALLET_POSITIONS    30
 
-#define MAXIMUM_BALLS       12
+#define MAXIMUM_BALLS       15
 #define BALL_MAX_Y          7
 #define BALL_MAX_X          15
-#define BALL_STEP_DELAY     20
-#define BALL_ALIVE_DELAY    50
+#define BALL_STEP_DELAY_MIN 5
+#define BALL_STEP_DELAY_MAX 25
+#define BALL_ALIVE_DELAY    40
 
 #define MAX_ANALOG_READ 1024.0
 
@@ -47,6 +48,7 @@ typedef struct {
   byte y;
   word ticks;
   boolean alive;
+  byte fallSpeed;
 } Ball;
 
 typedef struct {
@@ -92,7 +94,8 @@ void disableBall(byte i) {
 
 void enableBall(byte i) {
   balls[i].alive = true;
-  balls[i].ticks = BALL_STEP_DELAY;
+  balls[i].fallSpeed = random(BALL_STEP_DELAY_MIN, BALL_STEP_DELAY_MAX);
+  balls[i].ticks = balls[i].fallSpeed;
   balls[i].y = 0;
   balls[i].x = generateFreeBallX(i);
 }
@@ -175,7 +178,7 @@ void moveBall(byte i) {
 }
 
 void stepBall(byte i) {
-  balls[i].ticks = BALL_STEP_DELAY;
+  balls[i].ticks = balls[i].fallSpeed;
   balls[i].y += 1;
     
   if (balls[i].y > BALL_MAX_Y) {
