@@ -102,7 +102,9 @@ void loopGame() {
   healDelay--;
   if (healDelay <= 0) {
     healDelay = HEAL_DELAY;
-    damageTaken--;
+    if (damageTaken > 0) {
+      damageTaken--;
+    }
   }
 }
 
