@@ -1,3 +1,7 @@
+void loopPallet() {
+  pallet.position = readPalletPosition(); 
+}
+
 byte readPalletPosition() {
   return PALLET_POSITIONS - analogRead(A0) * PALLET_POSITIONS / MAX_ANALOG_READ;
 }

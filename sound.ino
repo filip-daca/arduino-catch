@@ -1,5 +1,5 @@
-void playSounds() {
-  playFireSound();
+void ringSound() {
+  ringFireSound();
 }
 
 void playStartSound() {
@@ -24,7 +24,7 @@ void startHitSound() {
   fire.soundHit = true;
 }
 
-void playFireSound() {
+void ringFireSound() {
   if (fire.sound > 4) {
     tone(PIN_BUZZ, 2500);
   } else if (fire.sound > 2) {
@@ -34,11 +34,14 @@ void playFireSound() {
       tone(PIN_BUZZ, 2000);
     }
   } else if (fire.sound > 1) {
-    noTone(PIN_BUZZ);
     fire.soundHit = false;
   }
 
   if (fire.sound > 0) {
     fire.sound--; 
   }
+}
+
+void muteSound() {
+  noTone(PIN_BUZZ);
 }

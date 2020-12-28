@@ -68,42 +68,46 @@ Ball balls[MAXIMUM_BALLS];
 Pallet pallet;
 
 byte score;
+byte damageTaken;
 
 void setup() {
+  initializeHardware();
+  
+  engineInit(lcd);
+  
+  initializeBalls();
+  initializeGame();
+}
+
+void initializeHardware() {
   if (DEBUG) {
     Serial.begin(9600);
   }
   lcd.begin(16, 2);
-  
-  engineInit(lcd);
-  initializeBalls();
-
   pinMode(PIN_BUZZ, OUTPUT);
   pinMode(PIN_BUTTON, INPUT_PULLUP);
-  
-  playStartSound();
+}
 
+void initializeGame() {
   score = 0;
+  damageTaken = 0;
+  playStartSound();
 }
 
 void loop() {
-  pallet.position = readPalletPosition();
+  loopPallet();
+  loopBalls();
+  loopFire();
 
-  generateBalls();
-  moveBalls();
-  
   engineClear(lcd);
-
-  handleFire();
-
   drawFire();
   drawBalls();
   drawPallet();
   engineFlush(lcd);
 
-  playSounds();
+  ringSound();
   
   delay(GAME_DELAY);
 
-  noTone(PIN_BUZZ);
+  muteSound();
 }

@@ -1,4 +1,4 @@
-void handleFire() {
+void loopFire() {
   if (fire.cooldown > 0) {
     fire.cooldown--;
   }

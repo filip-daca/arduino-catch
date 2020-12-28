@@ -1,3 +1,8 @@
+void loopBalls() {
+  generateBalls();
+  moveBalls();
+}
+
 void initializeBalls() {
   for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
     disableBall(i);
