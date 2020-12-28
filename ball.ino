@@ -69,9 +69,14 @@ void stepBall(byte i) {
   balls[i].y += 1;
     
   if (balls[i].y > BALL_MAX_Y) {
-    disableBall(i);
-    playMissSound();
+    fallOnGround(i);
   }
+}
+
+void fallOnGround(byte i) {
+  disableBall(i);
+  playMissSound();
+  damageTaken += BALL_HIT_DAMAGE;
 }
 
 void drawBalls() {

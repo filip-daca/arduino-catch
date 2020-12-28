@@ -15,12 +15,15 @@
 
 #define PALLET_POSITIONS    30
 
+#define HEAL_DELAY          20
+
 #define MAXIMUM_BALLS       15
 #define BALL_MAX_Y          7
 #define BALL_MAX_X          15
 #define BALL_STEP_DELAY_MIN 5
 #define BALL_STEP_DELAY_MAX 25
 #define BALL_ALIVE_DELAY    40
+#define BALL_HIT_DAMAGE     200
 
 #define MAX_ANALOG_READ 1024.0
 
@@ -69,6 +72,7 @@ Pallet pallet;
 
 byte score;
 byte damageTaken;
+byte healDelay;
 
 void setup() {
   initializeHardware();
@@ -92,6 +96,14 @@ void initializeGame() {
   score = 0;
   damageTaken = 0;
   playStartSound();
+}
+
+void loopGame() {
+  healDelay--;
+  if (healDelay <= 0) {
+    healDelay = HEAL_DELAY;
+    damageTaken--;
+  }
 }
 
 void loop() {
