@@ -1,5 +1,11 @@
+byte fireSound;
+byte hitSound;
+byte fallSound;
+
 void ringSound() {
   ringFireSound();
+  ringHitSound();
+  ringFallSound();
 }
 
 void playStartSound() {
@@ -17,31 +23,61 @@ void playMissSound() {
 }
 
 void startFireSound() {
-  fire.sound = 6;
+  fireSound = 5;
 }
 
 void startHitSound() {
-  fire.soundHit = true;
+  hitSound = 7;
+}
+
+void startFallSound() {
+  fallSound = 4;
 }
 
 void ringFireSound() {
-  if (fire.sound > 4) {
+  if (fireSound > 4) {
     tone(PIN_BUZZ, 2500);
-  } else if (fire.sound > 2) {
-    if (fire.soundHit) {
-      tone(PIN_BUZZ, 400);  
-    } else {
-      tone(PIN_BUZZ, 2000);
-    }
-  } else if (fire.sound > 1) {
-    fire.soundHit = false;
+  } else if (fireSound > 3) {
+    tone(PIN_BUZZ, 2300);
+  } else if (fireSound > 1) {
+    tone(PIN_BUZZ, 2120);
   }
 
-  if (fire.sound > 0) {
-    fire.sound--; 
+  if (fireSound > 0) {
+    fireSound--;
+  }
+}
+
+void ringHitSound() {
+  if (hitSound > 6) {
+    tone(PIN_BUZZ, 2500);
+  } else if (hitSound > 5) {
+    tone(PIN_BUZZ, 2300);
+  } else if (hitSound > 3) {
+    tone(PIN_BUZZ, 1120);
+  } else if (hitSound > 1) {
+    tone(PIN_BUZZ, 1300);
+  }
+
+  if (hitSound > 0) {
+    hitSound--;
+  }
+}
+
+void ringFallSound() {
+  if (fallSound > 2) {
+    tone(PIN_BUZZ, 700);
+  } else if (fallSound > 1) {
+    tone(PIN_BUZZ, 300);
+  }
+
+  if (fallSound > 0) {
+    fallSound--;
   }
 }
 
 void muteSound() {
-  noTone(PIN_BUZZ);
+  if (fireSound + hitSound + fallSound == 0) {
+    noTone(PIN_BUZZ);
+  }
 }

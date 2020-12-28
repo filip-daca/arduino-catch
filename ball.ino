@@ -75,7 +75,7 @@ void stepBall(byte i) {
 
 void fallOnGround(byte i) {
   disableBall(i);
-  playMissSound();
+  startFallSound();
   damageTaken += BALL_HIT_DAMAGE;
 }
 

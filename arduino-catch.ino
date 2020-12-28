@@ -7,7 +7,7 @@
 
 #define GAME_DELAY          25
 
-#define FIRE_COOLDOWN       5
+#define FIRE_COOLDOWN       8
 #define FIRE_STEP_DELAY     3
 
 #define TOP_ROW             0
@@ -62,8 +62,6 @@ typedef struct {
   byte x;
   byte cooldown;
   byte visible;
-  byte sound;
-  boolean soundHit;
 } Fire;
 
 Fire fire;

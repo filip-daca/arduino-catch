@@ -17,7 +17,7 @@ void shoot() {
     fire.visible = FIRE_STEP_DELAY;
 
     for (byte i = 0; i < MAXIMUM_BALLS; ++i) {
-      if (balls[i].x == fire.x) {
+      if (balls[i].alive && balls[i].x == fire.x) {
         score++;
         disableBall(i);
         startHitSound();
