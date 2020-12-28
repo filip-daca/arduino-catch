@@ -10,10 +10,10 @@ void handleFire() {
 }
 
 void shoot() {
-  if (position % 2 == 0) {
+  if (pallet.position % 2 == 0) {
     startFireSound();
     
-    fire.x = position / 2;
+    fire.x = pallet.position / 2;
     fire.visible = FIRE_STEP_DELAY;
 
     for (byte i = 0; i < MAXIMUM_BALLS; ++i) {

@@ -44,6 +44,10 @@ byte fireSprite[8] = {
 };
 
 typedef struct {
+  byte position;
+} Pallet;
+
+typedef struct {
   byte x;
   byte y;
   word ticks;
@@ -59,10 +63,11 @@ typedef struct {
   boolean soundHit;
 } Fire;
 
-byte score;
 Fire fire;
-int position;
 Ball balls[MAXIMUM_BALLS];
+Pallet pallet;
+
+byte score;
 
 void setup() {
   if (DEBUG) {
@@ -82,7 +87,7 @@ void setup() {
 }
 
 void loop() {
-  position = readPalletPosition();
+  pallet.position = readPalletPosition();
 
   generateBalls();
   moveBalls();
