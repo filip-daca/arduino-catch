@@ -83,7 +83,7 @@ void setup() {
   
   engineInit(lcd);
   
-  initializeGameplay();
+  initializeIntro();
 }
 
 void initializeHardware() {

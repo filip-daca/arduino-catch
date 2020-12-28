@@ -1,7 +1,8 @@
 byte scoreDelay;
 
 void initializeScoreboard() {
-  scoreDelay = 100;
+  scoreDelay = 50;
+  mode = MODE_SCORE;
 }
 
 void loopScoreboard() {
@@ -32,6 +33,6 @@ void drawScore() {
 
 void checkForRestart() {
   if (digitalRead(PIN_BUTTON) == LOW && scoreDelay == 0) {
-    initializeGameplay();
+    initializeIntro();
   }
 }

@@ -77,7 +77,9 @@ void fallOnGround(byte i) {
   disableBall(i);
   startFallSound();
   if (damageTaken + BALL_HIT_DAMAGE > 255) {
-    gameOver();
+    if (mode == MODE_GAME) {
+      gameOver();
+    }
   } else {
     damageTaken += BALL_HIT_DAMAGE;
   }

@@ -40,5 +40,5 @@ void loopHealth() {
 }
 
 void gameOver() {
-  mode = MODE_SCORE;
+  initializeScoreboard();
 }
