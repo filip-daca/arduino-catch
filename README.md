@@ -10,3 +10,7 @@ This is a scratch of a char LCD display game engine.
 - digital fire button
 - led health display
 - multiple sources of sound
+
+### Scheme
+
+![GitHub Logo](/docs/scheme.png)
