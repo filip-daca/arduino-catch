@@ -11,6 +11,11 @@ This is a scratch of a char LCD display game engine.
 - led health display
 - multiple sources of sound
 
+### Demo
+
+[![Arduino Shotty demo thumbnail](https://img.youtube.com/vi/c3PmlY3p5BU/0.jpg)](https://www.youtube.com/watch?v=c3PmlY3p5BU)
+
+
 ### Scheme
 
-![GitHub Logo](/docs/scheme.png)
+![Arduino Shotty circuit scheme](/docs/scheme.png)
