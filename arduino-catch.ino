@@ -3,6 +3,7 @@
 #define DEBUG               false
 
 #define PIN_BUZZ            8
+#define PIN_LED             10
 #define PIN_BUTTON          12
 
 #define GAME_DELAY          25
@@ -15,7 +16,7 @@
 
 #define PALLET_POSITIONS    30
 
-#define HEAL_DELAY          20
+#define HEAL_STEP           5
 
 #define MAXIMUM_BALLS       15
 #define BALL_MAX_Y          7
@@ -88,6 +89,7 @@ void initializeHardware() {
   lcd.begin(16, 2);
   pinMode(PIN_BUZZ, OUTPUT);
   pinMode(PIN_BUTTON, INPUT_PULLUP);
+  pinMode(PIN_LED, OUTPUT);
 }
 
 void initializeGame() {
@@ -97,16 +99,18 @@ void initializeGame() {
 }
 
 void loopGame() {
-  healDelay--;
-  if (healDelay <= 0) {
-    healDelay = HEAL_DELAY;
-    if (damageTaken > 0) {
-      damageTaken--;
-    }
+  if (damageTaken > 0) {
+    damageTaken -= HEAL_STEP;
+  }
+
+  analogWrite(PIN_LED, damageTaken);
+  if (DEBUG) {
+    Serial.println("DMG: " + String(damageTaken));
   }
 }
 
 void loop() {
+  loopGame();
   loopPallet();
   loopBalls();
   loopFire();

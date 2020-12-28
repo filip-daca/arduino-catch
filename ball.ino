@@ -76,7 +76,11 @@ void stepBall(byte i) {
 void fallOnGround(byte i) {
   disableBall(i);
   startFallSound();
-  damageTaken += BALL_HIT_DAMAGE;
+  if (damageTaken + BALL_HIT_DAMAGE > 255) {
+    
+  } else {
+    damageTaken += BALL_HIT_DAMAGE;
+  }
 }
 
 void drawBalls() {

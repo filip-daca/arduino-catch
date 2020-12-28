@@ -45,7 +45,7 @@ void engineFlush(LiquidCrystal lcd) {
   }
 
   if (DEBUG) {
-    Serial.println(getUsedSpriteCount());
+    Serial.println("SPR: " + String(getUsedSpriteCount()));
   }
 }
 
