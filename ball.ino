@@ -11,17 +11,17 @@ void disableBall(byte i) {
 
 void enableBall(byte i) {
   balls[i].alive = true;
-  balls[i].fallSpeed = random(BALL_STEP_DELAY_MIN, BALL_STEP_DELAY_MAX);
-  balls[i].ticks = balls[i].fallSpeed;
+  balls[i].stepDelay = random(BALL_STEP_DELAY_MIN, BALL_STEP_DELAY_MAX);
+  balls[i].ticks = balls[i].stepDelay;
   balls[i].y = 0;
-  balls[i].x = generateFreeBallX(i);
+  balls[i].x = findNewBallPosition(i);
 }
 
-byte generateFreeBallX(byte i) {
+byte findNewBallPosition(byte i) {
   byte newX = random(0, BALL_MAX_X);
   for (byte b = 0; b < MAXIMUM_BALLS; ++b) {
     if (b != i && balls[b].x == newX && balls[b].y < 4) {
-      return generateFreeBallX(i);
+      return findNewBallPosition(i);
     }
   }
   return newX;
@@ -60,7 +60,7 @@ void moveBall(byte i) {
 }
 
 void stepBall(byte i) {
-  balls[i].ticks = balls[i].fallSpeed;
+  balls[i].ticks = balls[i].stepDelay;
   balls[i].y += 1;
     
   if (balls[i].y > BALL_MAX_Y) {

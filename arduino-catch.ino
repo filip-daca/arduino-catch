@@ -48,7 +48,7 @@ typedef struct {
   byte y;
   word ticks;
   boolean alive;
-  byte fallSpeed;
+  byte stepDelay;
 } Ball;
 
 typedef struct {

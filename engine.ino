@@ -49,8 +49,6 @@ void engineFlush(LiquidCrystal lcd) {
   }
 }
 
-
-
 byte findOrCreateSprite(LiquidCrystal lcd, byte sprite[]) {
   for (byte i = 0; i < MAX_SPRITES; ++i) {
     if (spriteUsed[i] && memcmp(sprite, customSprites[i], SPRITE_LEN) == 0) {
