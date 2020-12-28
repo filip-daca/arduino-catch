@@ -1,4 +1,5 @@
 void initializeGameplay() {
+  initializePallet();
   initializeBalls();
   
   score = 0;
@@ -11,13 +12,13 @@ void initializeGameplay() {
 void loopGameplay() {
   loopHealth();
   loopPallet();
-  loopBalls();
   loopFire();
+  loopBalls();
 
   engineClear(lcd);
+  drawPallet();
   drawFire();
   drawBalls();
-  drawPallet();
   engineFlush(lcd);
 
   ringSound();
@@ -36,4 +37,8 @@ void loopHealth() {
   if (DEBUG) {
     Serial.println("DMG: " + String(damageTaken));
   }
+}
+
+void gameOver() {
+  mode = MODE_SCORE;
 }

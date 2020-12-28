@@ -1,3 +1,6 @@
+void initializePallet() {
+}
+
 void loopPallet() {
   pallet.position = readPalletPosition(); 
 }
