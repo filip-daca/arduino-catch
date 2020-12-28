@@ -26,6 +26,10 @@
 #define BALL_ALIVE_DELAY    40
 #define BALL_HIT_DAMAGE     200
 
+#define MODE_INTRO          0
+#define MODE_GAME           1
+#define MODE_SCORE          2
+
 #define MAX_ANALOG_READ 1024.0
 
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7); 
@@ -72,14 +76,14 @@ Pallet pallet;
 byte score;
 byte damageTaken;
 byte healDelay;
+byte mode;
 
 void setup() {
   initializeHardware();
   
   engineInit(lcd);
   
-  initializeBalls();
-  initializeGame();
+  initializeGameplay();
 }
 
 void initializeHardware() {
@@ -92,38 +96,10 @@ void initializeHardware() {
   pinMode(PIN_LED, OUTPUT);
 }
 
-void initializeGame() {
-  score = 0;
-  damageTaken = 0;
-  playStartSound();
-}
-
-void loopGame() {
-  if (damageTaken > 0) {
-    damageTaken -= HEAL_STEP;
-  }
-
-  analogWrite(PIN_LED, damageTaken);
-  if (DEBUG) {
-    Serial.println("DMG: " + String(damageTaken));
-  }
-}
-
 void loop() {
-  loopGame();
-  loopPallet();
-  loopBalls();
-  loopFire();
-
-  engineClear(lcd);
-  drawFire();
-  drawBalls();
-  drawPallet();
-  engineFlush(lcd);
-
-  ringSound();
-  
-  delay(GAME_DELAY);
-
-  muteSound();
+  switch (mode) {
+    case MODE_GAME:   loopGameplay();   break;
+    case MODE_INTRO:  loopIntro();      break;
+    case MODE_SCORE:  loopScoreboard(); break;
+  }
 }
